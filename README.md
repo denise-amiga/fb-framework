@@ -9,13 +9,13 @@ Included so far are:
 * A small set of templatable collections
 * An events framework to create classes that can raise and respond to events, VB.NET style
 * A Xml framework to read Xml files
-* A little framework to work with easings and other interpolation functions
 
 To be added:
 
 * A tasks framework to lay out concurrent tasks
 * A graphics framework to abstract several graphics backends (SDL, Cairo, etc)
 * A math framework
+* A windowing framework
 * Many more
 
 ## Install instructions
