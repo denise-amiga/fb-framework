@@ -6,7 +6,7 @@ Currently a WIP, but the public interface is mostly stable by now.
 Included so far are:
 
 * A templating framework
-* A small set of templated collections
+* A small set of templatable collections
 * An events framework to create classes that can raise and respond to events, VB.NET style
 * A Xml framework to read Xml files
 * A little framework to work with easings and other interpolation functions
