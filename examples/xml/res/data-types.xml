@@ -1,0 +1,8 @@
+<datatypes   >
+  <integer value="5"  >5</integer>
+  <string value="test">test</string>
+  <float value="1.23">1.23</float>
+  <double value="4.56">4.56</double>
+  <longint value="888">888</longint>
+  <bool value="true">true</bool>
+</datatypes>
