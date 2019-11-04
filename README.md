@@ -19,4 +19,4 @@ To be added:
 * Many more
 
 ## Install instructions
-Just merge the contents of the `inc` folder into the one of your own FreeBasic installation. The `examples` folder contains some examples on how to use the different frameworks.
+Just merge the contents of the `/inc` folder into the one of your own FreeBasic installation. The `/examples` folder contains some examples on how to use the different frameworks.
