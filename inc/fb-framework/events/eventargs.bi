@@ -7,9 +7,10 @@ namespace Events
     from this class.
     
     Note that there's a public 'Me' member. This member is equivalent
-    to 'this' and is needed to access the members of the class that
-    registered the listener. There's no need to set it manually and can
-    be left largely alone.
+    to the 'this' pointer and is needed to access the members of the
+    class that registered the listener. There's no need to set it
+    manually, as it will be forwarded to the listener by the 'WithEvents'
+    class.
   '/
   type _
     EventArgs _

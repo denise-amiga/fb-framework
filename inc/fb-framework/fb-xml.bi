@@ -4,6 +4,13 @@
 #include once "events.bi"
 #include once "parsing.bi"
 
+/'
+  Xml framework.
+  
+  10/28/2019
+    Initial version. Very basic functionality (just reading a Xml document).
+    Added support for events.
+'/
 namespace Xml
   type as Parsing.StringType _
     StringType

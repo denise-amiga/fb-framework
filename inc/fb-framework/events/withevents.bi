@@ -13,29 +13,21 @@ namespace Events
     NoEventsRegisteredYet => -1
   
   /'
-    This alias is needed because we can't qualify symbols in #defines or
-    #macros. The same technique can be used to template other symbols (ie
-    pointers).
-  '/
-  type as Events.Listener _
-    _EventListener
-  
-  /'
     Now we're templating both a linked list of receivers and a list of those.
     Since standard Lists use integers to index their items, this integer will
     serve as an abstract handle to identify each event, that the class that
-    encapsulates the list will use to dispatch the event to the list of receivers
-    associated to that handle.
+    encapsulates the list will use to dispatch the event to the list of
+    receivers associated to that handle.
     
     This means we can have an open ended number of listeners for any particular
     event.
   '/
   template( _
     LinkedList, _
-    of( _EventListener ) )
+    of( Listener ) )
   template( _
     List, _
-    of( LinkedList( of( _EventListener ) ) ) )
+    of( LinkedList( of( Listener ) ) ) )
   
   /'
     This structure contains caching information for linked list nodes.
@@ -50,7 +42,7 @@ namespace Events
       Contains a pointer to a linked list node that will be cached upon
       adding a handler for the class instance.
     '/
-    as LinkedListNode( of( _EventListener ) ) ptr _
+    as LinkedListNode( of( Listener ) ) ptr _
       listenerNode
     
     /'
@@ -67,10 +59,10 @@ namespace Events
   
   /'
     And now we template both a LinkedList of the 'NodeCacheInfo' structure,
-    and a Dictionary of them. Both of them will be used by the caching mechanism
-    to quickly remove event handlers upon an object's destruction. See the
-    implementation of the destructor for the 'WithEvents' class for more details
-    on how this works.
+    and a Dictionary of them. Both of them will be used by the caching
+    mechanism to quickly remove event handlers upon an object's destruction.
+    See the implementation of the destructor for the 'WithEvents' class for
+    more details on how this works.
   '/
   template( _
     LinkedList, _
@@ -83,7 +75,7 @@ namespace Events
   /'
     This class represents an object that can raise events. Every class
     that derives from this will be able to register and raise events,
-    and provide methods to add and remove handlers for them.
+    and provides methods to add and remove handlers for them.
     
     The class interface has two layers: the public one is used to add
     and remove event handlers for each specific event type (which uses
@@ -93,20 +85,22 @@ namespace Events
     
     Note that, even though objects now become a little more 'heavy',
     this effectively eliminates the need for an 'EventManager' class
-    of sorts (and to poll it for updates), since this base class is
+    of sorts and to poll it for updates, since this base class is
     now responsible for dispatching events to their listeners. All
     derived classes need to do is register the events they raise, 
-    and expose the event handles they get to the client code.
+    and expose the event handles they get to the client code through
+    the 'forInstance()' method.
     
     In this scheme, the 'register()' method ensures that each event
     registered gets its own unique handle, and that handle is exposed
     to clients through read-only const properties.
     
     This also greatly simplifies the event registering mechanism, since
-    events exposed can be registered on the constructors of classes, 
+    events exposed can be registered on the primary constructors of classes, 
     which can then be instantiated without the need to inject a reference
     to an event manager and/or manually do the wiring with a specialized
-    method (ie classes that raise events are self-contained).
+    method or exposing internals (ie. classes that raise events are
+    self-contained).
     
     Technically speaking, the class is implemented as a mixture of a
     Monostate and a vanilla class: the Monostate is used to keep track
@@ -121,12 +115,11 @@ namespace Events
     
     public:
       declare virtual destructor()
-      
+    
       declare sub _
         addHandler( _
           byref as const Event, _
-          byref as EventHandler, _
-          byval as Object ptr => 0 )
+          byref as EventHandler )
       declare sub _
         removeHandler( _
           byref as const Event, _
@@ -150,7 +143,7 @@ namespace Events
         list indexes the listeners for it.
       '/
       static as List( _
-        of( LinkedList( of( _EventListener ) ) ) ) _
+        of( LinkedList( of( Listener ) ) ) ) _
         _eventListeners
       
       /'
@@ -184,9 +177,9 @@ namespace Events
   end type
   
   dim as List( _
-    of( LinkedList( of( _EventListener ) ) ) ) _
+    of( LinkedList( of( Listener ) ) ) ) _
     WithEvents._eventListeners => List( _
-      of( LinkedList( of( _EventListener ) ) ) )( 1024 )
+      of( LinkedList( of( Listener ) ) ) )( 1024 )
     
   dim as Dictionary( _
     of( uinteger ), _
@@ -252,7 +245,7 @@ namespace Events
     if( not anEvent.registered ) then
       '' Create the list of event listeners for this event
       _eventListeners.add( _
-        new LinkedList( of( _EventListener ) ) )
+        new LinkedList( of( Listener ) ) )
       
       /'
         Increment the id counter. This will provide a unique id for
@@ -279,38 +272,29 @@ namespace Events
         changed (inadvertently or not), and to be able to implement a syntax
         akin to that of the VB.NET event handling scheme.
       '/
-      anEvent => Event( _
-        _eventId, _
-        anEvent.name )
+      anEvent => anEvent.withId( _eventId )
     end if
   end sub
   
   /'
-    Registers a listener for an event.
-    
-    An event handler (which is just a callback) and a receiver compose
-    a listener. The receiver is used to, among other things, implement
-    virtual event handlers.
+    Registers a listener for the specified event, using the provided
+    callback as handler.
   '/
   sub _
     WithEvents.addHandler( _
       byref anEvent as const Event, _
-      byref anEventHandler as EventHandler, _
-      byval aReceiver as Object ptr => 0 )
+      byref anEventHandler as EventHandler )
     
     var _
       handlers => _eventListeners.at( anEvent )
     
     if( handlers <> 0 ) then
-      if( aReceiver = 0 ) then
-        aReceiver => @this
-      end if
-      
       var _
         aListener => new Listener( _
           @anEvent, _
           anEventHandler, _
-          aReceiver )
+          @this, _
+          anEvent.instance )
       
       /'
         The caching mechanism for the added listeners is simple: upon
@@ -384,8 +368,7 @@ namespace Events
     
     Note that this function also passes the receiver of the event that was
     provided when the listener was first registered through the 'addHandler()'
-    method. This reference can be used to forward the event to a virtual
-    event handler.
+    method so you can reference the class that implements the event handler.
   '/
   sub _
     WithEvents.raiseEvent( _
@@ -410,14 +393,16 @@ namespace Events
         var _
           listener => node->item
         
-        /'
-          Set the receiver to the one that was passed when the event
-          handler was added...
-        '/
-        anEventArgs.Me => listener->receiver
-        
-        '' ...and invoke the event handler.
-        ( listener->handler )( this, anEventArgs )
+        if( listener->instance = @this ) then
+          /'
+            Set the receiver to the one that was passed when the event
+            handler was added...
+          '/
+          anEventArgs.Me => listener->receiver
+          
+          '' ...and invoke the event handler.
+          ( listener->handler )( this, anEventArgs )
+        end if
         
         node => node->forward
       next

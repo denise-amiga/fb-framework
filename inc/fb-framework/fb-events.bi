@@ -4,6 +4,18 @@
 /'
   Framework for creating classes that can raise events.
   
+  11/06/2019
+    Revamped the event system so it's properly encapsulated now, and can
+    correctly dispatch events to the right listeners without requiring the
+    client code to manually discriminate the correct sender, and without
+    an additional LUT.
+    
+    The solution is somewhat of a compromise, though: the class that exposes
+    the event needs to do so through the 'forInstance()' method, and pass a
+    pointer to itself to it. That way, the handler for the event can be
+    correctly paired with its receiver when the 'addHandler()' method is
+    called.
+  
   10/28/2019
     Some refactoring to simplify the registering and unregistering of
     events and handlers. All derived classes have to do now is 'register()'

@@ -33,7 +33,8 @@ namespace Xml
           byref as const StringType )
       declare virtual sub _
         onParse( _
-          byref as XmlParseContext )
+          byref as XmlParseContext, _
+          byval as XmlDocumentRoot ptr )
         
     private:
       static as Events.Event _
@@ -41,7 +42,7 @@ namespace Xml
       
       as StringType _
         _name
-      as XmlDocumentRoot _
+      as XmlDocumentRoot ptr _
         _root
       as XmlElement ptr _
         _documentElement
@@ -50,7 +51,8 @@ namespace Xml
   end type
   
   dim as Events.Event _
-    XmlDocument._documentLoaded => Events.Event( "DocumentLoaded" )
+    XmlDocument._documentLoaded => _
+      Events.Event( "DocumentLoaded" )
   
   constructor _
     XmlDocument()
@@ -60,13 +62,17 @@ namespace Xml
   
   destructor _
     XmlDocument()
+    
+    if( _root <> XmlNull ) then
+      delete( _root )
+    end if
   end destructor
   
   property _ 
     XmlDocument.documentLoaded() _
     byref as const Events.Event
     
-    return( _documentLoaded )
+    return( _documentLoaded.forInstance( @this ) )
   end property
   
   property _ 
@@ -80,7 +86,7 @@ namespace Xml
     XmlDocument.hasChildNodes() _
     as boolean
     
-    return( _root.hasChildNodes )
+    return( _root->hasChildNodes )
   end property
   
   property _
@@ -94,8 +100,9 @@ namespace Xml
     XmlDocument.loadXml( _
       byref aString as const StringType )
     
-    onLoadXml( aString )
-  
+    onLoadXml( _
+      aString )
+    
     raiseEvent( _
       documentLoaded, Events.EventArgs() )
   end sub
@@ -121,21 +128,30 @@ namespace Xml
       aString, _
       parsingFunctions() )
     
-    onParse( aContext )
+    if( _root <> XmlNull ) then
+      delete( _root )
+    end if
+    
+    _root => new XmlDocumentRoot()
+    
+    onParse( _
+      aContext, _
+      _root )
     
     _malformed => aContext.isMalformed
   end sub
   
   sub _
     XmlDocument.onParse( _
-      byref aContext as XmlParseContext )
+      byref aContext as XmlParseContext, _
+      byval aRootNode as XmlDocumentRoot ptr )
     
     dim as uinteger _
       result => parseTags( _
         aContext, _
-        @_root )
+        aRootNode )
     
-    _documentElement => _root.getDocumentElement()
+    _documentElement => aRootNode->getDocumentElement()
   end sub
 end namespace
 

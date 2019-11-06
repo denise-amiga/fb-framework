@@ -8,12 +8,14 @@ namespace Events
     
     The 'handler' property encapsulates the event handler proper, while
     the 'receiver' property encapsulates the object that is going to
-    receive the event. This allows us to implement both normal handlers
-    (which are static functions) and virtual handlers (which need the
-    'receiver' parameter to forward the event to the appropriate
-    virtual member).
+    receive the event (needed since handlers need to be static, and they
+    don't get passed a 'this' pointer).
+    The 'sender' property encapsulates the *instance* of the class that
+    will raise the event.
     
-    This structure is used internally by the events engine, so there's no
+    This structure is used internally by the events engine, and will be
+    filled with the appropriate data when clients register a handler for
+    an event (through the 'WithEvents.addHandler()' method), so there's no
     need to deal with it directly.
   '/
   type _
@@ -23,6 +25,7 @@ namespace Events
       declare constructor( _
         byval as const Event ptr, _ 
         byref as EventHandler, _
+        byval as Object ptr, _
         byval as Object ptr )
       declare destructor()
       
@@ -32,6 +35,8 @@ namespace Events
         handler() byref as EventHandler
       declare property _
         receiver() as Object ptr
+      declare property _
+        instance() as Object ptr
       
     private:
       declare constructor()
@@ -39,7 +44,8 @@ namespace Events
       as EventHandler _
         _handler
       as Object ptr _
-        _receiver
+        _receiver, _
+        _instance
       as const Event ptr _
         _event
   end type
@@ -52,11 +58,13 @@ namespace Events
     Listener( _
       byval anEvent as const Event ptr, _
       byref aHandler as EventHandler, _
-      byval aReceiver as Object ptr )
+      byval aReceiver as Object ptr, _
+      byval anInstance as Object ptr )
     
     _event => anEvent
     _handler => aHandler
     _receiver => aReceiver
+    _instance => anInstance
   end constructor
   
   destructor _
@@ -82,6 +90,13 @@ namespace Events
     as Object ptr
     
     return( _receiver )
+  end property
+  
+  property _
+    Listener.instance() _
+    as Object ptr
+    
+    return( _instance )
   end property
 end namespace
 

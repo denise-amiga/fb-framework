@@ -82,7 +82,7 @@
   
   /'
     Flags that the declaration is completed. The implementing macro
-    will use this symbol 
+    will use this symbol to bracket the type declaration.
   '/
   #define __T__##Auto_ptr##__##TType##__##decl_start
   
