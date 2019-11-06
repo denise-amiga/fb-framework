@@ -1,5 +1,8 @@
 #include once "parsing.bi"
 
+/'
+  Just some utility parsing function examples
+'/
 using Parsing
 
 dim as StringType _
@@ -41,5 +44,6 @@ for _
   
   ? tokens->at( i )
 next
+
 
 sleep()

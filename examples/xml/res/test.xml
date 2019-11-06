@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!-- 
+  Just some Xml to test the FreeBasic parser 
+-->
 <products>
   <product id="&quot;test&quot;">
     <barcode>1</barcode>

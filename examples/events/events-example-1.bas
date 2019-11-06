@@ -1,12 +1,28 @@
 #include once "events.bi"
 
 /'
-  Example 2: External event handlers.
+  Example 1: Basic event handling.
   
-  This example shows how you can hook an external handler for a class
-  event.
+  This example shows how you can use events to establish communication between
+  two classes. Events are like an abstract function call: the sender of the
+  event doesn't know how many listeners there are for its events, it just
+  raises it and all listeners that subscribed for handling the event will
+  receive the notification.
+  
+  Events are akin to 'Messages' (see <link to message-based programming>) but
+  they require no polling and no further discrimination of neither which class
+  sent the event nor which event it is being notified.
 '/
 
+/'
+  These two classes represent the arguments forwarded to the event
+  handlers upon raising of an event. Note that both derive from
+  'EventArgs', as there is some internal data that also needs to
+  be forwarded with the event. Concretely, there is a pointer to
+  the class that will handle the event ('Me'), to be able to
+  reference its members (event handlers are static so you don't get
+  the 'this' parameter passed to them).
+'/
 type _
   OperationCompletedEventArgs _
   extends Events.EventArgs
@@ -53,6 +69,11 @@ destructor _
   SomethingHappenedEventArgs()
 end destructor
 
+/'
+  Here we describe an object that will perform two operations that
+  raise events. Both events are exposed to the client code through
+  readonly properties.
+'/
 type _
   Object1 _
   extends Events.WithEvents
@@ -91,10 +112,21 @@ type _
     as string _
       _name
     
+    /'
+      And this is some internal state of the object, that will be
+      exposed to listeners of the 'OperationCompleted' event.
+    '/
     as integer _
       _someInternalState => -4
 end type
 
+/'
+  Events are declared like this (they are static vars).
+  
+  Note that you can also name them if you like. This can help in debugging
+  and implementing other schemes. Names are not really needed (events are
+  discriminated by their internal ids only).
+'/
 dim as Events.Event _
   Object1._EvOperationCompleted => _
     Events.Event()
@@ -110,6 +142,13 @@ constructor _
   Object1( _
     byref aName as const string )
   
+  /'
+    Registering the events will assign them a unique id, which other classes
+    will use to hook event handlers for them.
+    
+    Event registration will happen just once, the very first time a class of
+    this type is instantiated.
+  '/
   register( _EvOperationCompleted )
   register( _EvSomethingHappened )
   
@@ -120,6 +159,13 @@ destructor _
   Object1()
 end destructor
 
+/'
+  And this is how you can expose events to the client code through
+  readonly properties. Note that, to be able to discriminate the
+  instance of the class we're going to subscribe the listener for,
+  we return the static event through the 'forInstance' method, and
+  pass it a pointer to the instance itself.
+'/
 property _
   Object1.OperationCompleted() _
   byref as const Events.Event
@@ -143,6 +189,10 @@ property _
   return( _name )
 end property
 
+/'
+  The two operations the 'Object1' class implement will raise different
+  events, and pass them different event arguments.
+'/
 sub _
   Object1.operation1()
   
@@ -163,6 +213,15 @@ sub _
     SomethingHappenedEventArgs( "An error occurred." ) )
 end sub
 
+/'
+  And now this class defines another object that will listen to events
+  raised from another class.
+  
+  Note that the class' public interface is completely devoid of any members,
+  and that the class does not need to store a reference to the observed class.
+  All it really needs to do is adding handlers for the events its observer will
+  raise.
+'/
 type _
   Object2 _
   extends Events.WithEvents
@@ -211,6 +270,11 @@ constructor _
     asHandler( object1_somethingHappened ) )
 end constructor
 
+/'
+  Also note that manually removing handlers is not needed, as this is taken
+  care of automatically by the base class. All that is really needed is to
+  override the destructor.
+'/
 destructor _
   Object2()
 end destructor
@@ -260,45 +324,20 @@ sub _
 end sub
 
 /'
-  This is an external handler.
-  
-  An important thing to notice from these handlers is that, unlike member
-  handlers, you get NO CONTEXT other than that of the event itself. If you
-  need more context, then you'll either forward the event data to the
-  appropriate function, or implement another mechanism (such as direct
-  callbacks). 
-'/
-sub _
-  object_operationCompleted( _
-    byref sender as Object, _
-    byref e as OperationCompletedEventArgs )
-  
-  ? "External event handler: operation completed on: " & _
-    cptr( Object1 ptr, @sender )->name 
-end sub
-
-/'
   Example code
 '/
 var _
   anObject => Object1( "AnObject" ), _
   anotherObject => Object1( "AnotherObject" )
 
+/'
+  'anObserver' is going to handle the events of the 'anObject' instance. Note
+  that, even though both instances will indeed raise events, only the events
+  raised by 'anObject' will be handled.
+'/
 var _
   anObserver => Object2( anObject )
 
-/'
-  And this is how we can add an external (from outside the class) event
-  handler.
-'/
-anObject.addHandler( _
-  anObject.OperationCompleted, _
-  asHandler( object_operationCompleted ) )
-
-/'
-  Perform both operations on both instances of 'Object1', so they raise
-  their events.
-'/
 anObject.operation1()
 ?
 anotherObject.operation1()
