@@ -14,7 +14,7 @@ To be added:
 
 * A Xml writer (complements the Xml framework)
 * A tasks framework to lay out concurrent tasks
-* A graphics framework to abstract several graphics backends (SDL, Cairo, etc)
+* A graphics framework to abstract several graphics backends (SDL, SFML, FBGFX, Cairo, etc.)
 * A math framework
 * A windowing framework
 * A JSON framework to serialize/deserialize JSON
