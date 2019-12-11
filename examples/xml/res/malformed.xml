@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<!-- 
-  Another test. Note that the document is malformed.
--->
-<malformed <!-- Missing the end of the opening tag here -->
-  <someelement someproperty="somevalue"/>
-</malformed>
