@@ -1,4 +1,4 @@
-#include once "events.bi"
+#include once "fbfw-events.bi"
 
 /'
   Example 2: External event handlers.
@@ -277,35 +277,37 @@ sub _
     cptr( Object1 ptr, @sender )->name 
 end sub
 
-/'
-  Example code
-'/
-var _
-  anObject => Object1( "AnObject" ), _
-  anotherObject => Object1( "AnotherObject" )
-
-var _
-  anObserver => Object2( anObject )
-
-/'
-  And this is how we can add an external (from outside the class) event
-  handler.
-'/
-anObject.addHandler( _
-  anObject.OperationCompleted, _
-  asHandler( object_operationCompleted ) )
-
-/'
-  Perform both operations on both instances of 'Object1', so they raise
-  their events.
-'/
-anObject.operation1()
-?
-anotherObject.operation1()
-
-?
-anObject.operation2()
-?
-anotherObject.operation2()
+scope
+  /'
+    Example code
+  '/
+  var _
+    anObject => Object1( "AnObject" ), _
+    anotherObject => Object1( "AnotherObject" )
+  
+  var _
+    anObserver => Object2( anObject )
+  
+  /'
+    And this is how we can add an external (from outside the class) event
+    handler.
+  '/
+  anObject.addHandler( _
+    anObject.OperationCompleted, _
+    asHandler( object_operationCompleted ) )
+  
+  /'
+    Perform both operations on both instances of 'Object1', so they raise
+    their events.
+  '/
+  anObject.operation1()
+  ?
+  anotherObject.operation1()
+  
+  ?
+  anObject.operation2()
+  ?
+  anotherObject.operation2()
+end scope
 
 sleep()

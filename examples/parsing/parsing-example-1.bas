@@ -1,7 +1,8 @@
-#include once "parsing.bi"
+#include once "fbfw-parsing.bi"
 
 /'
-  Just some utility parsing function examples
+  Example using the Parsing framework to perform some common
+  parsing tasks.
 '/
 using Parsing
 
@@ -44,6 +45,5 @@ for _
   
   ? tokens->at( i )
 next
-
 
 sleep()

@@ -1,5 +1,8 @@
-#include once "xml.bi"
+#include once "fbfw-xml.bi"
 
+/'
+  Xml loading and parsing example
+'/
 sub _
   xmlDoc_documentLoaded( _
     byref sender as Xml.XmlDocument, _
@@ -51,16 +54,13 @@ sub _
   end if
 end sub
 
-/'
-  Xml loading and parsing example
-'/
-'' Instantiate a XmlDocument
+'' Instantiate a Xml document
 var _
   xmlDoc => Xml.XmlDocument() _
 
 /'
-  We're going to add a handler just so it tells us whether it loaded
-  the document or not, and if it is malformed.
+  We're going to add a handler just so it tells us whether the
+  document was loaded or not, and if it is malformed.
 '/
 xmlDoc.addHandler( _
   xmlDoc.documentLoaded, _
@@ -68,7 +68,7 @@ xmlDoc.addHandler( _
 
 '' Load the Xml text
 xmlDoc.loadXml( _
-  Parsing.Strings.fromFile( "res/test.xml" ) )
+  Parsing.Strings.fromFile( "../common/res/test.xml" ) )
 
 /'
   And then check: if the document has child nodes and is not malformed,
@@ -79,11 +79,8 @@ if( _
   xmlDoc.hasChildNodes andAlso _
   not xmlDoc.malformed ) then
   
-  var _
-    root => xmlDoc.documentElement
-  
   ? "Nodes of the document element: "
-  showNodesOf( root )
+  showNodesOf( xmlDoc.documentElement )
 end if
 
 /'
@@ -93,7 +90,7 @@ end if
 '/
 ?
 xmlDoc.loadXml( _
-  Parsing.Strings.fromFile( "res/data-types.xml" ) )
+  Parsing.Strings.fromFile( "../common/res/data-types.xml" ) )
 
 if( _
   xmlDoc.hasChildNodes andAlso _

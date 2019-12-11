@@ -1,5 +1,5 @@
-#include once "collections.bi"
-#include once "bi/person-type.bi"
+#include once "fbfw-collections.bi"
+#include once "../common/bi/person.bi"
 
 /'
   Basic templating.

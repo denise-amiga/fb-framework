@@ -1,4 +1,4 @@
-#include once "events.bi"
+#include once "fbfw-events.bi"
 
 /'
   Example 1: Basic event handling.
@@ -8,10 +8,6 @@
   event doesn't know how many listeners there are for its events, it just
   raises it and all listeners that subscribed for handling the event will
   receive the notification.
-  
-  Events are akin to 'Messages' (see <link to message-based programming>) but
-  they require no polling and no further discrimination of neither which class
-  sent the event nor which event it is being notified.
 '/
 
 /'
@@ -323,28 +319,30 @@ sub _
     ". Message: " & aMessage
 end sub
 
-/'
-  Example code
-'/
-var _
-  anObject => Object1( "AnObject" ), _
-  anotherObject => Object1( "AnotherObject" )
-
-/'
-  'anObserver' is going to handle the events of the 'anObject' instance. Note
-  that, even though both instances will indeed raise events, only the events
-  raised by 'anObject' will be handled.
-'/
-var _
-  anObserver => Object2( anObject )
-
-anObject.operation1()
-?
-anotherObject.operation1()
-
-?
-anObject.operation2()
-?
-anotherObject.operation2()
+scope
+  /'
+    Example code
+  '/
+  var _
+    anObject => Object1( "AnObject" ), _
+    anotherObject => Object1( "AnotherObject" )
+  
+  /'
+    'anObserver' is going to handle the events of the 'anObject' instance. Note
+    that, even though both instances will indeed raise events, only the events
+    raised by 'anObject' will be handled.
+  '/
+  var _
+    anObserver => Object2( anObject )
+  
+  anObject.operation1()
+  ?
+  anotherObject.operation1()
+  
+  ?
+  anObject.operation2()
+  ?
+  anotherObject.operation2()
+end scope
 
 sleep()
