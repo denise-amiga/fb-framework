@@ -29,11 +29,6 @@ namespace Tasks
         availableThreads() as integer
       
       declare sub _
-        lock()
-      declare sub _
-        unlock()
-      
-      declare sub _
         queueTask( _
           byval as ITask ptr )
       declare sub _
@@ -56,6 +51,10 @@ namespace Tasks
         run( _
           byval as TaskManager ptr )
         
+      declare sub _
+        lock()
+      declare sub _
+        unlock()
       declare sub _
         cleanUp()
       
@@ -111,33 +110,15 @@ namespace Tasks
       mutexLock( _mutex )
       _locked => true
     end if
-    'mutexLock( _lockMutex )
-    '  if( _lockCount = 0 ) then
-    '    mutexLock( _taskManagerMutex )
-    '  end if
-    '  
-    '  _lockCount +=> 1
-    'mutexUnlock( _lockMutex )
   end sub
   
   sub _
     TaskManager.unlock()
     
     if( _locked ) then
-      mutexUnLock( _mutex )
       _locked => false
+      mutexUnLock( _mutex )
     end if
-    'if( _lockCount > 0 ) then
-    '  mutexLock( _lockMutex )
-    '    _lockCount -=> 1
-    '    
-    '    if( _lockCount = 0 ) then
-    '      mutexUnlock( _taskManagerMutex )
-    '    end if
-    '  mutexUnlock( _lockMutex )
-    'else
-    '  beep()
-    'end if
   end sub
   
   function _
@@ -165,6 +146,8 @@ namespace Tasks
     TaskManager.queueTask( _
       byval aTask as ITask ptr )
     
+    this.lock()
+    
     select case as const( aTask->status )
       case( TaskStatus.Halted )
         _pendingTasks->addLast( *aTask )
@@ -172,6 +155,8 @@ namespace Tasks
       case( TaskStatus.Suspended )
         _suspendedTasks->addLast( *aTask )
     end select
+    
+    this.unlock()
   end sub
   
   /'
@@ -295,8 +280,6 @@ namespace Tasks
   sub _
     TaskManager.cleanUp()
     
-    '? "TaskManager:: cleanUp()"
-    
     for _
       i as integer => 0 _
       to _availableThreads - 1
@@ -316,7 +299,7 @@ namespace Tasks
     Task.attachTo( _
       byval aTaskManager as TaskManager ptr )
     
-    aTaskManager->lock()
+    'aTaskManager->lock()
       aTaskManager->queueTask( @this )
       
       var _
@@ -336,7 +319,7 @@ namespace Tasks
         
         childTaskNode => childTaskNode->forward
       next
-    aTaskManager->unlock()
+    'aTaskManager->unlock()
   end sub
 end namespace
 

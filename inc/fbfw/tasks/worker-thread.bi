@@ -335,7 +335,6 @@ namespace Tasks
     _idleThreadsCount => _availableThreads
     _running => true
     _mutex => mutexCreate()
-    _lockMutex => mutexCreate()
     _startTime => now()
     
     '' And create the main thread for the Task Manager itself
