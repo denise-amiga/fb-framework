@@ -149,6 +149,7 @@ namespace Math
     as float4
     
     v.normalize()
+    
     return( v )
   end function
   
@@ -285,7 +286,7 @@ namespace Math
     
     dim as float _
       angleCos => _
-        dot( v.unit(), w.unit() )
+        dot( v.normalized(), w.normalized() )
       
     return( -acos( fClamp( -1.0, 1.0, angleCos ) ) )
   end function
@@ -298,7 +299,7 @@ namespace Math
     
     dim as float _
       angleCos => _
-        dot( v.unit(), w.unit() )
+        dot( v.normalized(), w.normalized() )
       
     return( -acos( fClamp( -1.0, 1.0, angleCos ) ) )
   end function
@@ -311,7 +312,7 @@ namespace Math
     
     dim as float _
       angleCos => _
-        dot( v.unit(), w.unit() )
+        dot( v.normalized(), w.normalized() )
       
     return( -acos( fClamp( -1.0, 1.0, angleCos ) ) )
   end function

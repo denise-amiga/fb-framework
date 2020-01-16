@@ -20,6 +20,9 @@ namespace Events
       declare constructor()
       declare virtual destructor()
       
+      declare static function _
+        empty() as EventArgs
+      
       as any ptr _
         Me
   end type
@@ -31,6 +34,13 @@ namespace Events
   destructor _
     EventArgs() export
   end destructor
+  
+  function _
+    EventArgs.empty() _
+    as EventArgs export
+    
+    return( EventArgs() )
+  end function
 end namespace
 
 #endif

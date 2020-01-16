@@ -72,8 +72,7 @@ namespace Tasks
         _lockCount
       as any ptr _
         _thread, _
-        _mutex, _
-        _lockMutex
+        _mutex
       as boolean _
         _running, _
         _locked
@@ -93,7 +92,6 @@ namespace Tasks
     
     threadWait( _thread )
     mutexDestroy( _mutex )
-    mutexDestroy( _lockMutex )
   end destructor
   
   property _
