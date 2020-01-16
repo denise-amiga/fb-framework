@@ -11,34 +11,6 @@
   almost every other drawing function.
 '/
 namespace Drawing
-  ''' Abstracts a color value
-  'type as ulong _
-  '  FbColor
-  
-  /'
-    Constants for standard colors
-  '/
-  'enum _
-  '  Colors
-  '  
-  '  Black => rgb( 0, 0, 0 )
-  '  Blue => rgb( 0, 0, 175 )
-  '  Green => rgb( 19, 161, 14 )
-  '  Cyan => rgb( 0, 168, 175 )
-  '  Red => rgb( 197, 15, 31 )
-  '  Violet => rgb( 136, 23, 152 )
-  '  Yellow => rgb( 193, 156, 0 )
-  '  Gray => rgb( 178, 165, 178 )
-  '  DarkGray => rgb( 118, 118, 118 )
-  '  LightBlue => rgb( 59, 120, 255 )
-  '  LightGreen => rgb( 22, 198, 12 )
-  '  LightCyan => rgb( 97, 214, 214 )
-  '  LightRed => rgb( 213, 72, 86 )
-  '  LightViolet => rgb( 180, 0, 158 )
-  '  LighYellow => rgb( 255, 255, 80 )
-  '  White => rgb( 242, 242, 242 )
-  'end enum
-  
   /'
     Defines an alignment, generally expressed with respect to a bounding
     rectangle or some other anchor.
