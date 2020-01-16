@@ -22,7 +22,7 @@ namespace Parsing
   enum _
     SpecialChars
     
-    Null => 0
+    NullChar => 0
     Tab => 9
     Lf => 10
     Cr => 13
@@ -289,6 +289,27 @@ namespace Parsing
     end function
     
     /'
+      Writes a string to the specified file
+    '/
+    sub _
+      toFile( _
+        byref aString as const StringType, _
+        byref aPath as const StringType )
+      
+      dim as long _
+        fileHandle => freeFile()
+      
+      open _
+        aPath _
+        for output _
+        as fileHandle
+      
+      print #fileHandle, aString
+      
+      close( fileHandle )
+    end sub
+    
+    /'
       Splits a string into tokens, using the specified delimiters. The
       last optional parameter allows you to specify whether you want the
       function to retrieve the delimiters or not.
@@ -298,7 +319,7 @@ namespace Parsing
         byref aString as StringType, _
         byref delimiters as const StringType, _
         byval retrieveDelimiters as boolean => true ) _
-      as auto_ptr( of( Array( of( StringType ) ) ) )
+      as Auto_ptr( of( Array( of( StringType ) ) ) )
       
       '' Trivial reject
       if( _

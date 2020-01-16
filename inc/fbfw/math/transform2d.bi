@@ -204,7 +204,7 @@ namespace Math
         rebuild()
       end if
       
-      m_invTransform => Math.inverse( m_transform )
+      m_invTransform => m_transform.inversed()
       m_needsRecomputeInverse => false
     end if
     

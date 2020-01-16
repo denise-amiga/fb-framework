@@ -146,21 +146,21 @@ namespace Interaction
         var _
           ev => cptr( Fb.Event ptr, e )
         
-        if( ev->type = Fb.EVENT_KEY_PRESS ) then
-          _state( ev->scanCode ) or=> _
-            ( KeyState.Pressed or KeyState.Held or KeyState.Repeated )
-          _state( ev->scanCode ) => _
-            _state( ev->scanCode ) and not KeyState.AlreadyPressed
-        end if
-        
-        if( ev->type = Fb.EVENT_KEY_RELEASE ) then
-          _state( ev->scanCode ) or=> KeyState.Released
-          _state( ev->scanCode ) => _
-            _state( ev->scanCode ) and not KeyState.AlreadyReleased
-          _state( ev->scanCode ) => _state( ev->scanCode ) and not _
-            ( KeyState.Held or KeyState.HeldInitialized or _
-              KeyState.Repeated or KeyState.RepeatedInitialized )
-        end if
+        select case as const( ev->type )
+          case Fb.EVENT_KEY_PRESS
+            _state( ev->scanCode ) or=> _
+              ( KeyState.Pressed or KeyState.Held or KeyState.Repeated )
+            _state( ev->scanCode ) => _
+              _state( ev->scanCode ) and not KeyState.AlreadyPressed
+            
+          case Fb.EVENT_KEY_RELEASE
+            _state( ev->scanCode ) or=> KeyState.Released
+            _state( ev->scanCode ) => _
+              _state( ev->scanCode ) and not KeyState.AlreadyReleased
+            _state( ev->scanCode ) => _state( ev->scanCode ) and not _
+              ( KeyState.Held or KeyState.HeldInitialized or _
+                KeyState.Repeated or KeyState.RepeatedInitialized )
+        end select
       mutexUnlock( _mutex )
     end sub
     

@@ -18,6 +18,10 @@ namespace Drawing
     declare constructor( _
       byref as Point, _
       byref as Size )
+    declare constructor( _
+      byref as Rectangle )
+    declare constructor( _
+      byref as _RectangleF )
     declare destructor()
     
     declare property _
@@ -44,9 +48,18 @@ namespace Drawing
         byref as Rectangle ) _
       as boolean
     declare function _
+      isInsideOf( _
+        byref as _RectangleF ) _
+      as boolean
+    declare function _
       overlapsWith( _
         byref as Rectangle ) _
       as boolean
+    declare function _
+      overlapsWith( _
+        byref as _RectangleF ) _
+      as boolean
+    
     declare function _
       contains( _
         byval as integer, _
@@ -235,6 +248,22 @@ namespace Drawing
     location => aLocation
     extents => aSize
   end constructor
+  
+  constructor _
+    Rectangle( _
+      byref aRectangle as Rectangle )
+    
+    this.constructor( _
+      aRectangle.X, aRectangle.Y, _
+      aRectangle.width, aRectangle.height )
+  end constructor
+  
+  /'
+    ** Constructor Rectangle( byref as _RectangleF ) **
+    
+    The missing constructor def is placed after the definition of
+    the RectangleF class.
+  '/
   
   destructor _
     Rectangle()

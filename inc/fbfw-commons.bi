@@ -33,6 +33,8 @@
   interaction/
 #define __FBFW_MATH_FOLDER__ _
   math/
+#define __FBFW_RANDOMIZATION_FOLDER__ _
+  randomization/
 #define __FBFW_TASKS_FOLDER__ _
   tasks/
 #define __FBFW_THREADING_FOLDER__ _

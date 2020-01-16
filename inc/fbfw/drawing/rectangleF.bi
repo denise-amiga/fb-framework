@@ -18,6 +18,10 @@ namespace Drawing
     declare constructor( _
       byref as PointF, _
       byref as SizeF )
+    declare constructor( _
+      byref as Rectangle )
+    declare constructor( _
+      byref as RectangleF )
     declare destructor()
     
     declare property _
@@ -41,7 +45,15 @@ namespace Drawing
     
     declare function _
       isInsideOf( _
+        byref as Rectangle ) _
+      as boolean
+    declare function _
+      isInsideOf( _
         byref as RectangleF ) _
+      as boolean
+    declare function _
+      overlapsWith( _
+        byref as Rectangle ) _
       as boolean
     declare function _
       overlapsWith( _
@@ -164,6 +176,7 @@ namespace Drawing
     
     declare operator _
       cast() as string
+    
     declare operator _
       +=( _
         byref as RectangleF )
@@ -226,6 +239,36 @@ namespace Drawing
     
     location => aLocation
     extents => aSize
+  end constructor
+  
+  constructor _
+    RectangleF( _
+      byref aRectangle as Rectangle )
+    
+    this.constructor( _
+      aRectangle.X, aRectangle.Y, _
+      aRectangle.width, aRectangle.height )
+    'location => PointF( _
+    '  aRectangle.location.x, _
+    '  aRectangle.location.y )
+    'extents => SizeF( _
+    '  aRectangle.extents.width, _
+    '  aRectangle.extents.height )
+  end constructor
+  
+  constructor _
+    RectangleF( _
+      byref aRectangle as RectangleF )
+    
+    this.constructor( _
+      aRectangle.X, aRectangle.Y, _
+      aRectangle.width, aRectangle.height )
+    'location => PointF( _
+    '  aRectangle.location.x, _
+    '  aRectangle.location.y )
+    'extents => SizeF( _
+    '  aRectangle.extents.width, _
+    '  aRectangle.extents.height )
   end constructor
   
   destructor _
@@ -292,6 +335,20 @@ namespace Drawing
   
   function _
     RectangleF.isInsideOf( _
+      byref another as Rectangle ) _
+    as boolean
+    
+    return( cbool( _
+      int( location.x ) - another.location.x >= 0 andAlso _
+      int( location.x + extents.width ) - _
+        another.location.x <= another.extents.width andAlso _
+      int( location.y ) - another.location.y >= 0 andAlso _
+      int( location.y + extents.height ) - _
+        another.location.y <= another.extents.height ) )
+  end function
+  
+  function _
+    RectangleF.isInsideOf( _
       byref another as RectangleF ) _
     as boolean
     
@@ -302,6 +359,18 @@ namespace Drawing
       location.y - another.location.y >= 0 andAlso _
       location.y + extents.height - _
         another.location.y <= another.extents.height ) )
+  end function
+  
+  function _
+    RectangleF.overlapsWith( _
+      byref another as Rectangle ) _
+    as boolean
+    
+    return( cbool( _
+      int( location.x + extents.width ) >= another.location.x andAlso _
+      int( location.y + extents.height ) >= another.location.y andAlso _
+      int( location.x ) <= another.location.x + another.extents.width andAlso _
+      int( location.y ) <= another.location.y + another.extents.height ) )
   end function
   
   function _
@@ -849,6 +918,44 @@ namespace Drawing
       lhs.location, _
       lhs.extents - rhs ) )
   end operator
+  
+  /'
+    Copy constructor for Rectangle from RectangleF
+  '/
+  constructor _
+    Rectangle( _
+      byref aRectangle as RectangleF )
+    
+    this.constructor( _
+      aRectangle.X, aRectangle.Y, _
+      aRectangle.width, aRectangle.height )
+  end constructor
+  
+  function _
+    Rectangle.isInsideOf( _
+      byref another as RectangleF ) _
+    as boolean
+    
+    return( cbool( _
+      location.x - int( another.location.x ) >= 0 andAlso _
+      location.x + extents.width - _
+        int( another.location.x ) <= int( another.extents.width ) andAlso _
+      location.y - int( another.location.y ) >= 0 andAlso _
+      location.y + extents.height - _
+        int( another.location.y ) <= int( another.extents.height ) ) )
+  end function
+  
+  function _
+    Rectangle.overlapsWith( _
+      byref another as RectangleF ) _
+    as boolean
+    
+    return( cbool( _
+      location.x + extents.width >= int( another.location.x ) andAlso _
+      location.y + extents.height >= int( another.location.y ) andAlso _
+      location.x <= int( another.location.x + another.extents.width ) andAlso _
+      location.y <= int( another.location.y + another.extents.height ) ) )
+  end function
 end namespace
 
 #endif

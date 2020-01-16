@@ -188,17 +188,17 @@ namespace Interaction
           ev => cptr( Fb.Event ptr, e )
         
         select case as const( ev->type )
-          case( Fb.EVENT_MOUSE_MOVE )
+          case Fb.EVENT_MOUSE_MOVE
             _x => ev->x
             _y => ev->y
           
-          case( Fb.EVENT_MOUSE_BUTTON_PRESS )
+          case Fb.EVENT_MOUSE_BUTTON_PRESS
             _state( ev->button ) or=> _
               ( ButtonState.Pressed or ButtonState.Held or ButtonState.Repeated )
             _state( ev->button ) => _
               _state( ev->button ) and not ButtonState.AlreadyPressed
             
-          case( Fb.EVENT_MOUSE_BUTTON_RELEASE )
+          case Fb.EVENT_MOUSE_BUTTON_RELEASE
             _state( ev->button ) or=> ButtonState.Released
             _state( ev->button ) => _
               _state( ev->button ) and not ButtonState.AlreadyReleased
@@ -206,15 +206,18 @@ namespace Interaction
               ( ButtonState.Held or ButtonState.HeldInitialized or _
                 ButtonState.Repeated or ButtonState.RepeatedInitialized )
               
-          case( Fb.EVENT_MOUSE_WHEEL )
+          case _
+            Fb.EVENT_MOUSE_WHEEL, _
+            Fb.EVENT_MOUSE_HWHEEL
+            
             _hWheel => ev->w
             _vWheel => ev->z
           
-          case( Fb.EVENT_MOUSE_ENTER )
+          case Fb.EVENT_MOUSE_ENTER
             raiseEvent( _
               MouseEnter, Events.EventArgs() )
             
-          case( Fb.EVENT_MOUSE_EXIT )
+          case Fb.EVENT_MOUSE_EXIT
             raiseEvent( _
               MouseLeave, Events.EventArgs() )
         end select
