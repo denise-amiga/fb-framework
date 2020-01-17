@@ -21,7 +21,7 @@ To be added:
 * Many more
 
 ## Install instructions
-Just copy/merge the contents of the `/inc` folder into the one of your own FreeBasic installation. The `/examples` folder contains some examples on how to use the different frameworks.
+Just copy/merge the contents of the `/inc` folder (its _contents_, not the folder itself) into the `/inc` folder of your own FreeBasic installation. The `/examples` folder contains some examples on how to use the different frameworks.
 
 ## Usage notes
 I'm working heavily on this ATM so it is to be considered 'WIP'. The templating, the collections and the event frameworks are unlikely to change, but I'm working heavily on some of the others (ie they're not yet stable enough to be pushed here or are just barebones).
