@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- 
+  Just some Xml to test the FreeBasic parser 
+-->
+<products>
+  <product id="&quot;test&quot;">
+    <barcode>1</barcode>
+    <posdescription>SW FRUITY POPS ORIG LOLLY 120S</posdescription>
+    <category>CHOCOLATE ON THE GO</category>
+    <price>7.20</price>
+  </product>
+  <product id="&quot;another&quot;">
+    <barcode>2</barcode>
+    <posdescription>KIT KAT SENSES CARAMEL CREAM</posdescription>
+    <category>CHOCOLATE ON THE GO</category>
+    <price>0.55</price>
+  </product>
+  <product id="&apos;4&apos;">
+    <barcode>3</barcode>
+    <posdescription>HARIBO MAOAM MINIS</posdescription>
+    <category>CHOCOLATE ON THE GO</category>
+    <price>0.12</price>
+  </product>
+  <product id="foo">
+    <barcode>4</barcode>
+    <posdescription>ES FAMILY TISSUES PM59</posdescription>
+    <category>PAPER PRODUCTS</category>
+    <price>0.59</price>
+  </product>
+  <product id="&lt;bar&gt;">
+    <barcode>5</barcode>
+    <posdescription>S/BRITE GRILL SCRUB</posdescription>
+    <category>WORK &amp; JANITORIAL</category>
+    <price>3.59</price>
+  </product>
+  <product id="baz">
+    <barcode>6</barcode>
+    <posdescription>BOLLINGER N.V.BRUT CHAMPAGNE</posdescription>
+    <category>WINE</category>
+    <price>37.49</price>
+  </product>
+  <product id="4.5">
+    <barcode>7</barcode>
+    <posdescription>TABASCO PEPPER SAUCE ORIG</posdescription>
+    <category>PICKLE/SCE/CONDIMENT</category>
+    <price>2.15</price>
+  </product>
+  <product id="5.8">
+    <barcode>8</barcode>
+    <posdescription>LYONS CHOC LAYER CAKE PM119</posdescription>
+    <category>BREAD &amp; CAKES</category>
+    <price>1.19</price>
+  </product>
+</products>
