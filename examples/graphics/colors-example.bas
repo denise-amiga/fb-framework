@@ -1,7 +1,8 @@
 #include once "fbfw-drawing.bi"
 
 /'
-  Example showing four color models
+  Example showing the four color models currently 
+  implemented.
 '/
 using Drawing
 
@@ -39,27 +40,19 @@ sub _
           x as integer => 0 _
           to aDisplay.width - 1
           
+          dim as integer _
+            fw => ( 255 / aDisplay.width ) * x, _
+            fh => ( 255 / aDisplay.height ) * y
+          
           pixels[ ( y * aDisplay.width ) + x ] => iif( _
             aModel = ColorModel.RGB, FbColor.fromRGBA( _
-              255, _
-              ( 255 / aDisplay.width ) * x, _
-              ( 255 / aDisplay.height ) * y, _
-              255 ), iif( _
+              255, fw, fh, 255 ), iif( _
             aModel = ColorModel.HSV, FbColor.fromHSV( _
-              ( 255 / aDisplay.width ) * x, _
-              255, _
-              ( 255 / aDisplay.height ) * y, _
-              255 ), iif( _
+              fw, 255, fh, 255 ), iif( _
             aModel = ColorModel.HSL, FbColor.fromHSL( _
-              ( 255 / aDisplay.width ) * x, _
-              255, _
-              ( 255 / aDisplay.height ) * y, _
-              255 ), iif( _
+              fw, 255, fh, 255 ), iif( _
             aModel = ColorModel.HCY, FbColor.fromHCY( _
-              ( 255 / aDisplay.width ) * x, _
-              255, _
-              ( 255 / aDisplay.height ) * y, _
-              255 ), _
+              fw, 255, fh, 255 ), _
             FbColor.Black ) ) ) )
         next
       next
