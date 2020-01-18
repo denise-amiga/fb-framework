@@ -56,7 +56,7 @@ namespace Drawing
       ( sizeOf( Fb.Image ) \ sizeOf( ulong ) )
   
   '' The conversion function for colors
-  #define __cclr__( c ) culng( c )
+  #define __cvclr__( c ) culng( c )
   
   '' Masks for the color components
   #define __R_MASK__ &h00ff0000
@@ -68,38 +68,22 @@ namespace Drawing
   
   #ifndef Color_R
     #define Color_R( c ) _
-      ( __cclr__( c ) shr 16 and 255 )
+      ( __cvclr__( c ) shr 16 and 255 )
   #endif
   
   #ifndef Color_G
     #define Color_G( c ) _
-      ( __cclr__( c ) shr 8 and 255 )
+      ( __cvclr__( c ) shr 8 and 255 )
   #endif
   
   #ifndef Color_B
     #define Color_B( c ) _
-      ( __cclr__( c ) and 255 )
+      ( __cvclr__( c ) and 255 )
   #endif
   
   #ifndef Color_A
     #define Color_A( c ) _
-      ( __cclr__( c ) shr 24 )
-  #endif
-  
-  #ifndef fbRGB
-    #define fbRGB( r, g, b ) _
-      ( ( __cclr__( r ) shl 16 ) or _
-      ( __cclr__( g ) shl 8 ) or _
-      __cclr__( b ) or _
-      __A_MASK__ )
-  #endif
-  
-  #ifndef fbRGBA
-    #define fbRGBA( r, g, b, a ) _
-      ( ( __cclr__( r ) shl 16 ) or _
-      ( __cclr__( g ) shl 8 ) or _
-      __cclr__( b ) or _
-      __cclr__( a ) shl 24 )
+      ( __cvclr__( c ) shr 24 )
   #endif
   
   /'
