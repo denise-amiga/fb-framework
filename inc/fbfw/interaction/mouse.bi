@@ -28,6 +28,14 @@ namespace Interaction
         declare property _
           Y() as integer
         declare property _
+          deltaX() as integer
+        declare property _
+          deltaY() as integer
+        declare property _
+          startX() as integer
+        declare property _
+          startY() as integer
+        declare property _
           horizontalWheel() as integer
         declare property _
           verticalWheel() as integer
@@ -54,18 +62,26 @@ namespace Interaction
             byval as integer, _
             byval as double => 0.0 ) _
           as boolean
+        declare function _
+          drag( _
+            byval as integer ) _
+          as boolean
+        declare function _
+          drop( _
+            byval as integer ) _
+          as boolean
         
       protected:
         enum _
           ButtonState
             None
-            Pressed =>             ( 1 shl 0 )
-            AlreadyPressed =>      ( 1 shl 1 )
-            Released =>            ( 1 shl 2 )
-            AlreadyReleased =>     ( 1 shl 3 )
-            Held =>                ( 1 shl 4 )
-            HeldInitialized =>     ( 1 shl 5 )
-            Repeated =>            ( 1 shl 6 )
+            Pressed             => ( 1 shl 0 )
+            AlreadyPressed      => ( 1 shl 1 )
+            Released            => ( 1 shl 2 )
+            AlreadyReleased     => ( 1 shl 3 )
+            Held                => ( 1 shl 4 )
+            HeldInitialized     => ( 1 shl 5 )
+            Repeated            => ( 1 shl 6 )
             RepeatedInitialized => ( 1 shl 7 )
         end enum
         
@@ -75,6 +91,8 @@ namespace Interaction
         
         as integer _
           _x, _y, _
+          _sx, _sy, _
+          _dx, _dy, _
           _hWheel, _
           _vWheel
         
@@ -95,6 +113,11 @@ namespace Interaction
         '/
         as any ptr _
           _mutex
+        
+        as boolean _
+          _pressed, _
+          _dragging, _
+          _dropped
     end type
     
     dim as Events.Event _
@@ -161,6 +184,34 @@ namespace Interaction
     end property
     
     property _
+      MouseInput.deltaX() _
+      as integer
+      
+      return( _dx )
+    end property
+    
+    property _
+      MouseInput.deltaY() _
+      as integer
+      
+      return( _dy )
+    end property
+    
+    property _
+      MouseInput.startX() _
+      as integer
+      
+      return( _sx )
+    end property
+    
+    property _
+      MouseInput.startY() _
+      as integer
+      
+      return( _sy )
+    end property
+    
+    property _
       MouseInput.horizontalWheel() _
       as integer
       
@@ -191,12 +242,27 @@ namespace Interaction
           case Fb.EVENT_MOUSE_MOVE
             _x => ev->x
             _y => ev->y
-          
+            
+            if( _pressed ) then
+              _dx => _x - _sx
+              _dy => _y - _sy
+              
+              _dragging => true
+              _dropped => false
+            end if
+            
           case Fb.EVENT_MOUSE_BUTTON_PRESS
             _state( ev->button ) or=> _
               ( ButtonState.Pressed or ButtonState.Held or ButtonState.Repeated )
             _state( ev->button ) => _
               _state( ev->button ) and not ButtonState.AlreadyPressed
+            
+            _dx => 0
+            _dy => 0
+            _sx => _x
+            _sy => _y
+            _pressed => true
+            _dragging => false
             
           case Fb.EVENT_MOUSE_BUTTON_RELEASE
             _state( ev->button ) or=> ButtonState.Released
@@ -205,7 +271,15 @@ namespace Interaction
             _state( ev->button ) => _state( ev->button ) and not _
               ( ButtonState.Held or ButtonState.HeldInitialized or _
                 ButtonState.Repeated or ButtonState.RepeatedInitialized )
-              
+            
+            _pressed => false
+            
+            if( _dx <> 0 andAlso _dy <> 0 ) then
+              _dropped => true
+            else
+              _dropped => false
+            end if
+            
           case _
             Fb.EVENT_MOUSE_WHEEL, _
             Fb.EVENT_MOUSE_HWHEEL
@@ -336,6 +410,26 @@ namespace Interaction
       mutexUnlock( _mutex )
       
       return( isRepeated )
+    end function
+    
+    function _
+      MouseInput.drag( _
+        byval aButton as integer ) _
+      as boolean
+      
+      return( _
+        held( aButton ) andAlso _
+        _dragging )
+    end function
+    
+    function _
+      MouseInput.drop( _
+        byval aButton as integer ) _
+      as boolean
+      
+      return( _
+        released( aButton ) andAlso _
+        _dropped )
     end function
   end namespace
 end namespace

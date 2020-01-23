@@ -79,13 +79,13 @@ namespace Interaction
         enum _
           KeyState
             None
-            Pressed =>             ( 1 shl 0 )
-            AlreadyPressed =>      ( 1 shl 1 )
-            Released =>            ( 1 shl 2 )
-            AlreadyReleased =>     ( 1 shl 3 )
-            Held =>                ( 1 shl 4 )
-            HeldInitialized =>     ( 1 shl 5 )
-            Repeated =>            ( 1 shl 6 )
+            Pressed             => ( 1 shl 0 )
+            AlreadyPressed      => ( 1 shl 1 )
+            Released            => ( 1 shl 2 )
+            AlreadyReleased     => ( 1 shl 3 )
+            Held                => ( 1 shl 4 )
+            HeldInitialized     => ( 1 shl 5 )
+            Repeated            => ( 1 shl 6 )
             RepeatedInitialized => ( 1 shl 7 )
         end enum
         

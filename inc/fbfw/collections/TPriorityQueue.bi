@@ -281,6 +281,7 @@
       
       if( _elements( i ) <> 0 ) then
         delete( _elements( i ) )
+        _elements( i ) => 0
       end if
     next
   end sub

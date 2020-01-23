@@ -1,11 +1,11 @@
 #include once "fbfw-collections.bi"
-#include once "../common/bi/person.bi"
+#include once "../common/inc/person.bi"
 
 template( List, of( Person ) )
 template( Auto_ptr, of( Person ) )
 
-#include once "../common/bi/person-predicates.bi"
-#include once "../common/bi/person-actions.bi"
+#include once "../common/inc/person-predicates.bi"
+#include once "../common/inc/person-actions.bi"
 
 /'
   Some simple use cases for auto_ptrs

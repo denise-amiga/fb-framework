@@ -93,6 +93,7 @@ namespace Parsing
       
       return( false )
     end function
+    
     /'
       Splices a string and returns it trimmed, with the spliced
       string in the 'aSplice' parameter.

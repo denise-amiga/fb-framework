@@ -3,8 +3,8 @@
 
 namespace Drawing
   /'
-    Represent the operations that can be performed on a Graphics.Display
-    object.
+    Represent the operations that can be performed on a
+    Display object.
   '/
   type _
     DisplayOps _
@@ -23,12 +23,12 @@ namespace Drawing
         opForeColor() as Drawing.FbColor
       declare abstract property _
         opForeColor( _
-          byref as Drawing.FbColor )
+          byref as const Drawing.FbColor )
       declare abstract property _
         opBackColor() as Drawing.FbColor
       declare abstract property _
         opBackColor( _
-          byref as Drawing.FbColor )
+          byref as const Drawing.FbColor )
       declare abstract property _
         opRows() as integer
       declare abstract property _
@@ -49,33 +49,55 @@ namespace Drawing
           byval as integer, _
           byval as integer )
       declare abstract sub _
-        opClear()
+        opClear( _
+          byval as Drawing.Surface ptr )
       declare abstract sub _
         opClear( _
-          byref as Drawing.FbColor )
+          byval as Drawing.Surface ptr, _
+          byref as const Drawing.FbColor )
       declare abstract sub _
-        opStartFrame()
+        opClear( _
+          byval as Drawing.Surface ptr, _
+          byref as const Drawing.FbColor, _
+          byref as const Drawing.FbColor )
       declare abstract sub _
-        opEndFrame()
+        opStartFrame( _
+          byval as Drawing.Surface ptr )
+      declare abstract sub _
+        opEndFrame( _
+          byval as Drawing.Surface ptr )
+      
+      declare abstract function _
+        opCreateSurface( _
+          byval as integer, _
+          byval as integer ) _
+        as Drawing.Surface ptr
+      declare abstract function _
+        opCreateGraphics( _
+          byref as Drawing.Surface ) _
+        as Drawing.Graphics ptr
       
       declare abstract sub _
         opTextAt( _
+          byval as Drawing.Surface ptr, _
           byval as integer, _
           byval as integer, _
           byref as const string )
       declare abstract sub _
         opTextAt( _
+          byval as Drawing.Surface ptr, _
           byval as integer, _
           byval as integer, _
           byref as const string, _
-          byref as Drawing.FbColor )
+          byref as const Drawing.FbColor )
       declare abstract sub _
         opTextAt( _
+          byval as Drawing.Surface ptr, _
           byval as integer, _
           byval as integer, _
           byref as const string, _
-          byref as Drawing.FbColor, _
-          byref as Drawing.FbColor )
+          byref as const Drawing.FbColor, _
+          byref as const Drawing.FbColor )
       
     protected:
       declare property _
