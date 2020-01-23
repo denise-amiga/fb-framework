@@ -33,7 +33,15 @@ namespace Drawing
       declare property _
         foreColor() as Drawing.FbColor
       declare property _
+        foreColor( _
+          byref as const Drawing.FbColor )
+      declare property _
         backColor() as Drawing.FbColor
+      declare property _
+        backColor( _
+          byref as const Drawing.FbColor )
+      declare virtual property _
+        graphics() byref as Drawing.Graphics
       
       declare sub _
         init( _
@@ -49,12 +57,16 @@ namespace Drawing
         initFullScreen( _
           byval as integer, _
           byval as integer )
-      
+        
       declare sub _
         clear()
       declare sub _
         clear( _
-          byval as Drawing.FbColor )
+          byref as const Drawing.FbColor )
+      declare sub _
+        clear( _
+          byref as const Drawing.FbColor, _
+          byref as const Drawing.FbColor )
       declare sub _
         startFrame()
       declare sub _
@@ -69,14 +81,14 @@ namespace Drawing
           byval as integer, _
           byval as integer, _
           byref as const string, _
-          byval as Drawing.FbColor )
+          byval as const Drawing.FbColor )
       declare sub _
         textAt( _
           byval as integer, _
           byval as integer, _
           byref as const string, _
-          byval as Drawing.FbColor, _
-          byval as Drawing.FbColor )
+          byval as const Drawing.FbColor, _
+          byval as const Drawing.FbColor )
       
     protected:
       declare constructor()
@@ -96,11 +108,20 @@ namespace Drawing
           byval as Drawing.DisplayOps ptr, _
           byval as boolean )
       declare sub _
+        initSurface( _
+          byval as integer, _
+          byval as integer )
+        
+      declare sub _
         dispose()
       
       static as Events.Event _
         _EvDisplayChanged
       
+      static as Drawing.Surface ptr _
+        _surface
+      static as Drawing.Graphics ptr _
+        _graphics
       static as boolean _
         _needsDisposing
   end type
@@ -110,6 +131,10 @@ namespace Drawing
       Events.Event( "DisplayChanged" )
   dim as Drawing.DisplayOps ptr _
     Display._displayOps => 0
+  dim as Drawing.Surface ptr _
+    Display._surface => 0
+  dim as Drawing.Graphics ptr _
+    Display._graphics => 0
   dim as boolean _
     Display._needsDisposing => false
   
@@ -167,12 +192,14 @@ namespace Drawing
   sub _
     Display.dispose()
     
-    if( _
-      _displayOps <> 0 andAlso _
-      _needsDisposing ) then
-      
-      delete( _displayOps )
+    if( _needsDisposing ) then
+      if( _displayOps <> 0 ) then
+        delete( _displayOps )
+      end if
     end if
+    
+    delete( _surface )
+    delete( _graphics )
   end sub
   
   property _
@@ -225,11 +252,52 @@ namespace Drawing
   end property
   
   property _
+    Display.foreColor( _
+      byref value as const Drawing.FbColor )
+    
+    _displayOps->opForeColor => value
+  end property
+  
+  property _
     Display.backColor() _
     as Drawing.FbColor
     
     return( _displayOps->opBackColor )
   end property
+  
+  property _
+    Display.backColor( _
+      byref value as const Drawing.FbColor )
+    
+    _displayOps->opBackColor => value
+  end property
+  
+  property _
+    Display.graphics() _
+    byref as Drawing.Graphics
+    
+    return( *_graphics )
+  end property
+  
+  sub _
+    Display.initSurface( _
+      byval aWidth as integer, _
+      byval aHeight as integer )
+    
+    if( _surface <> 0 ) then
+      delete( _surface )
+    end if
+    
+    _surface => _displayOps->opCreateSurface( _
+      aWidth, aHeight )
+    
+    if( _graphics <> 0 ) then
+      delete( _graphics )
+    end if
+    
+    _graphics => _displayOps->opCreateGraphics( _
+        *_surface )
+  end sub
   
   sub _
     Display.init( _
@@ -238,6 +306,8 @@ namespace Drawing
     
     _displayOps->opInit( _
       aWidth, aHeight )
+    
+    initSurface( aWidth, aHeight )
     
     raiseEvent( _
       displayChanged, Events.EventArgs() )
@@ -248,6 +318,10 @@ namespace Drawing
     
     _displayOps->opInitFullScreen()
     
+    initSurface( _
+      _displayOps->opWidth, _
+      _displayOps->opHeight )
+    
     raiseEvent( _
       displayChanged, Events.EventArgs() )
   end sub
@@ -257,6 +331,10 @@ namespace Drawing
     
     _displayOps->opInitFullScreenLowest()
     
+    initSurface( _
+      _displayOps->opWidth, _
+      _displayOps->opHeight )
+    
     raiseEvent( _
       displayChanged, Events.EventArgs() )
   end sub
@@ -265,6 +343,10 @@ namespace Drawing
     Display.initFullScreenHighest()
     
     _displayOps->opInitFullScreenHighest()
+    
+    initSurface( _
+      _displayOps->opWidth, _
+      _displayOps->opHeight )
     
     raiseEvent( _
       displayChanged, Events.EventArgs() )
@@ -278,6 +360,10 @@ namespace Drawing
     _displayOps->opInitFullScreen( _
       aWidth, aHeight )
     
+    initSurface( _
+      _displayOps->opWidth, _
+      _displayOps->opHeight )
+    
     raiseEvent( _
       displayChanged, Events.EventArgs() )
   end sub
@@ -285,59 +371,76 @@ namespace Drawing
   sub _
     Display.clear()
     
-    _displayOps->opClear()
+    _displayOps->opClear( _
+      _surface )
   end sub
   
   sub _
     Display.clear( _
-      byval aColor as Drawing.FbColor )
+      byref aBackColor as const Drawing.FbColor )
     
-    _displayOps->opClear( aColor )
+    _displayOps->opClear( _
+      _surface, aBackColor )
+  end sub
+  
+  sub _
+    Display.clear( _
+      byref aForeColor as const Drawing.FbColor, _
+      byref aBackColor as const Drawing.FbColor )
+    
+    _displayOps->opClear( _
+      _surface, aForeColor, aBackColor )
   end sub
   
   sub _
     Display.startFrame()
     
-    _displayOps->opStartFrame()
+    _displayOps->opStartFrame( _surface )
   end sub
   
   sub _
     Display.endFrame()
     
-    _displayOps->opEndFrame()
+    _displayOps->opEndFrame( _surface )
   end sub
   
   sub _
     Display.textAt( _
-      byval aCol as integer, _
       byval aRow as integer, _
+      byval aCol as integer, _
       byref aText as const string )
     
     _displayOps->opTextAt( _
-      aCol, aRow, aText )
+      _surface, aCol, aRow, aText )
   end sub
   
   sub _
     Display.textAt( _
-      byval aCol as integer, _
       byval aRow as integer, _
+      byval aCol as integer, _
       byref aText as const string, _
-      byval aForeColor as Drawing.FbColor )
+      byval aForeColor as const Drawing.FbColor )
     
     _displayOps->opTextAt( _
-      aCol, aRow, aText, aForeColor )
+      _surface, _
+      aCol, aRow, _
+      aText, _
+      aForeColor )
   end sub
   
   sub _
     Display.textAt( _
-      byval aCol as integer, _
       byval aRow as integer, _
+      byval aCol as integer, _
       byref aText as const string, _
-      byval aForeColor as Drawing.FbColor, _
-      byval aBackColor as Drawing.FbColor )
+      byval aForeColor as const Drawing.FbColor, _
+      byval aBackColor as const Drawing.FbColor )
     
     _displayOps->opTextAt( _
-      aCol, aRow, aText, aForeColor, aBackColor )
+      _surface, _
+      aCol, aRow, _
+      aText, _
+      aForeColor, aBackColor )
   end sub
 end namespace
 

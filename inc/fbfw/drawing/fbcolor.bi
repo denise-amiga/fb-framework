@@ -1,6 +1,8 @@
 #ifndef __FBFW_DRAWING_COLOR__
 #define __FBFW_DRAWING_COLOR__
 
+#include once "color-spaces.bi"
+
 namespace Drawing
   type _
     _ccFloat
@@ -19,7 +21,7 @@ namespace Drawing
     
     public:
       declare constructor( _
-        byref as FbColor )
+        byref as const FbColor )
       declare destructor()
       
       declare static function _
@@ -27,51 +29,80 @@ namespace Drawing
           byval as ulong ) _
         as FbColor
       declare static function _
-        fromRGB( _
-          byval as ubyte, _
-          byval as ubyte, _
-          byval as ubyte ) _
-        as FbColor
-      declare static function _
         fromRGBA( _
           byval as ubyte, _
           byval as ubyte, _
           byval as ubyte, _
-          byval as ubyte ) _
+          byval as ubyte => 255 ) _
         as FbColor
       declare static function _
         fromHSV( _
           byval as ubyte, _
           byval as ubyte, _
           byval as ubyte, _
-          byval as ubyte ) _
+          byval as ubyte => 255 ) _
+        as FbColor
+      declare static function _
+        fromHSV( _
+          byref as HSVAColor ) _
         as FbColor
       declare static function _
         fromHSL( _
           byval as ubyte, _
           byval as ubyte, _
           byval as ubyte, _
-          byval as ubyte ) _
+          byval as ubyte => 255 ) _
+        as FbColor
+      declare static function _
+        fromHSL( _
+          byref as HSLAColor ) _
         as FbColor
       declare static function _
         fromHCY( _
           byval as ubyte, _
           byval as ubyte, _
           byval as ubyte, _
-          byval as ubyte ) _
+          byval as ubyte => 255 ) _
+        as FbColor
+      declare static function _
+        fromHCY( _
+          byref as HCYAColor ) _
         as FbColor
       
       declare const operator _
         cast() as ulong
       
-      declare property _
+      declare const property _
         R() as ubyte
-      declare property _
+      declare const property _
         G() as ubyte
-      declare property _
+      declare const property _
         B() as ubyte
-      declare property _
+      declare const property _
         A() as ubyte
+      
+      declare const function _
+        toHSV() as HSVAColor
+      declare const function _
+        toHSL() as HSLAColor
+      declare const function _
+        toHCY() as HCYAColor
+      
+      declare const function _
+        mix( _
+          byref as FbColor, _
+          byval as double ) _
+        as FbColor
+      declare const function _
+        mixColor( _
+          byref as const FbColor, _
+          byval as double ) _
+        as FbColor
+      declare const function _
+        mixAlpha( _
+          byval as ubyte, _
+          byval as double ) _
+        as FbColor
       
       declare static function _
         AliceBlue() byref as const FbColor
@@ -407,6 +438,10 @@ namespace Drawing
         _RGBtoHSL( _
           byref as _ccFloat ) _
         as _ccFloat
+      declare static function _
+        _RGBtoHCY( _
+          byref as _ccFloat ) _
+        as _ccFloat
       
       as ubyte _
         _B, _G, _R, _A
@@ -717,13 +752,29 @@ namespace Drawing
     FbColor._Yellow => FbColor.fromRGBA( 255, 255, 0, 255 ), _
     FbColor._YellowGreen => FbColor.fromRGBA( 154, 205, 50, 255 )
   
+  #macro __clerp__( c, am )
+    FbColor( _
+      ( c.R - _R ) * am + _R, _
+      ( c.G - _G ) * am + _G, _
+      ( c.B - _B ) * am + _B, _
+      ( c.A - _A ) * am + _A )
+  #endmacro
+  
+  #macro __clerp_c__( c, am )
+    FbColor( _
+      ( c.R - _R ) * am + _R, _
+      ( c.G - _G ) * am + _G, _
+      ( c.B - _B ) * am + _B, _
+      _A )
+  #endmacro
+  
   constructor _
     FbColor()
   end constructor
   
   constructor _
     FbColor( _
-      byref rhs as FbColor )
+      byref rhs as const FbColor )
     
     _R => rhs._R
     _G => rhs._G
@@ -735,20 +786,8 @@ namespace Drawing
     FbColor( _
       byval aR as ubyte, _
       byval aG as ubyte, _
-      byval aB as ubyte )
-    
-    _R => aR
-    _G => aG
-    _B => aB
-    _A = 255
-  end constructor
-  
-  constructor _
-    FbColor( _
-      byval aR as ubyte, _
-      byval aG as ubyte, _
       byval aB as ubyte, _
-      byval aA as ubyte )
+      byval aA as ubyte => 255 )
     
     _R => aR
     _G => aG
@@ -918,22 +957,44 @@ namespace Drawing
   end function  
   
   function _
+    FbColor._RGBtoHCY( _
+      byref aRGB as _ccFloat ) _
+    as _ccFloat
+    
+    var _
+      aHCV => _RGBtoHCV( aRGB )
+    
+    dim as double _
+      Y => _cdot( aRGB, _HCYWeights ), _
+      Z => _cdot( _HueToRGB( aHCV.x ), _HCYWeights )
+    
+    if( Y < Z ) then
+      aHCV.y *=> Z / ( _epsilon + Y )
+    else
+      aHCV.y *=> ( 1.0 - Z ) / ( _epsilon + 1 - Y )
+    end if
+    
+  'float3 HCV = RGBtoHCV(RGB);
+  '  float Y = dot(RGB, HCYwts);
+  '  float Z = dot(HUEtoRGB(HCV.x), HCYwts);
+  '  if (Y < Z)
+  '  {
+  '    HCV.y *= Z / (Epsilon + Y);
+  '  }
+  '  else
+  '  {
+  '    HCV.y *= (1 - Z) / (Epsilon + 1 - Y);
+  '  }
+  '  return float3(HCV.x, HCV.y, Y);    
+    return( type<_ccFloat>( aHCV.x, aHCV.y, Y ) )
+  end function
+  
+  function _
     FbColor.fromColor( _
       byval aColor as ulong ) _
     as FbColor
     
     return( FbColor( aColor ) )
-  end function
-  
-  function _
-    FbColor.fromRGB( _
-      byval aR as ubyte, _
-      byval aG as ubyte, _
-      byval aB as ubyte ) _
-    as FbColor
-    
-    return( FbColor( _
-      aR, aG, aB ) )
   end function
   
   function _
@@ -971,6 +1032,25 @@ namespace Drawing
   end function
   
   function _
+    FbColor.fromHSV( _
+      byref aHSV as HSVAColor ) _
+    as FbColor
+    
+    var _
+      c => _HSVtoRGB( type <_ccFloat>( _
+        aHSV.H * _cconv, _
+        aHSV.S * _cconv, _
+        aHSV.V * _cconv, _
+        1.0 ) )
+        
+    return( FbColor( _
+      c.x * 255, _
+      c.y * 255, _
+      c.z * 255, _
+      aHSV.A ) )
+  end function
+  
+  function _
     FbColor.fromHSL( _
       byval aH as ubyte, _
       byval aaS as ubyte, _
@@ -993,18 +1073,37 @@ namespace Drawing
   end function
   
   function _
+    FbColor.fromHSL( _
+      byref aHSL as HSLAColor ) _
+    as FbColor
+    
+    var _
+      c => _HSLtoRGB( type <_ccFloat>( _
+        aHSL.H * _cconv, _
+        aHSL.S * _cconv, _
+        aHSL.L * _cconv, _
+        1.0 ) )
+      
+    return( FbColor( _
+      c.x * 255, _
+      c.y * 255, _
+      c.z * 255, _
+      aHSL.A ) )
+  end function
+  
+  function _
     FbColor.fromHCY( _
       byval aH as ubyte, _
-      byval aaS as ubyte, _
-      byval aV as ubyte, _
+      byval aC as ubyte, _
+      byval aY as ubyte, _
       byval aA as ubyte ) _
     as FbColor
     
     var _
       c => _HCYtoRGB( type <_ccFloat>( _
         aH * _cconv, _
-        aaS * _cconv, _
-        aV * _cconv, _
+        aC * _cconv, _
+        aY * _cconv, _
         1.0 ) )
       
     return( FbColor( _
@@ -1012,6 +1111,79 @@ namespace Drawing
       c.y * 255, _
       c.z * 255, _
       aA ) )
+  end function
+  
+  function _
+    FbColor.fromHCY( _
+      byref aHCY as HCYAColor ) _
+    as FbColor
+    
+    var _
+      c => _HCYtoRGB( type <_ccFloat>( _
+        aHCY.H * _cconv, _
+        aHCY.C * _cconv, _
+        aHCY.Y * _cconv, _
+        1.0 ) )
+      
+    return( FbColor( _
+      c.x * 255, _
+      c.y * 255, _
+      c.z * 255, _
+      aHCY.A ) )
+  end function
+  
+  function _
+    FbColor.toHSV() _
+    as HSVAColor
+    
+    var _
+      c => _RGBtoHSV( type <_ccFloat>( _
+        R * _cconv, _
+        G * _cconv, _
+        B * _cconv, _
+        1.0 ) )
+      
+    return( HSVAColor( _
+      c.x * 255, _
+      c.y * 255, _
+      c.z * 255, _
+      A ) )
+  end function
+  
+  function _
+    FbColor.toHSL() _
+    as HSLAColor
+    
+    var _
+      c => _RGBtoHSL( type <_ccFloat>( _
+        R * _cconv, _
+        G * _cconv, _
+        B * _cconv, _
+        1.0 ) )
+      
+    return( HSLAColor( _
+      c.x * 255, _
+      c.y * 255, _
+      c.z * 255, _
+      A ) )
+  end function
+  
+  function _
+    FbColor.toHCY() _
+    as HCYAColor
+    
+    var _
+      c => _RGBtoHCY( type <_ccFloat>( _
+        R * _cconv, _
+        G * _cconv, _
+        B * _cconv, _
+        1.0 ) )
+      
+    return( HCYAColor( _
+      c.x * 255, _
+      c.y * 255, _
+      c.z * 255, _
+      A ) )
   end function
   
   property _
@@ -1041,6 +1213,35 @@ namespace Drawing
     
     return( _A )
   end property
+  
+  function _
+    FbColor.mix( _
+      byref another as FbColor, _
+      byval amount as double ) _
+    as FbColor
+    
+    return( __clerp__( another, amount ) )
+  end function
+  
+  function _
+    FbColor.mixColor( _
+      byref another as const FbColor, _
+      byval amount as double ) _
+    as FbColor
+    
+    return( __clerp_c__( another, amount ) )
+  end function
+  
+  function _
+    FbColor.mixAlpha( _
+      byval another as ubyte, _
+      byval amount as double ) _
+    as FbColor
+    
+    return( FbColor( _
+      _R, _G, _B, _
+      ( another - _A ) * amount + _A ) )
+  end function
   
   function _
     FbColor.AliceBlue() byref as const FbColor : return( _AliceBlue ) : end function
@@ -1324,6 +1525,9 @@ namespace Drawing
     FbColor.Yellow() byref as const FbColor : return( _Yellow ) : end function
   function _
     FbColor.YellowGreen() byref as const FbColor : return( _YellowGreen ) : end function
+  
+  #undef __clerp__
+  #undef __clerp_a__
 end namespace
 
 #endif

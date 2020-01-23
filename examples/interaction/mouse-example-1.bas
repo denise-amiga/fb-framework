@@ -22,23 +22,24 @@ var _
 dim as boolean _
   toggle => false
 
+dim as Fb.Event _
+  e
+
 do
   '' Poll events
-  dim as Fb.Event _
-    e
-  
   do while( screenEvent( @e ) )
     keyboard.onEvent( @e )
     mouse.onEvent( @e )
   loop
   
-  dim as ulong _
-    ballColor => rgb( 255, 0, 0 ), _
+  var _
+    ballColor => FbColor.fromRGBA( 255, 0, 0 ), _
     squareColor => iif( toggle, _
-      rgb( 255, 255, 0 ), rgb( 0, 255, 0 ) )
+      FbColor.fromRGBA( 255, 255, 0 ), _
+      FbColor.fromRGBA( 0, 255, 0 ) )
   
   if( mouse.held( Fb.BUTTON_LEFT ) ) then
-    ballColor => rgb( 0, 0, 255 )
+    ballColor => FbColor.fromRGBA( 0, 0, 255 )
   end if
   
   if( mouse.repeated( Fb.BUTTON_LEFT, 200.0 ) ) then
@@ -50,15 +51,19 @@ do
     .startFrame()
     .clear()
     
-    circle _
-      ( mouse.x, mouse.y ), _
-      25, ballColor, , , , f
-    
-    line _
-      ( mouse.x - 200 - 25, mouse.y - 25 ) - _
-      ( mouse.x - 200 + 25, mouse.y + 25 ), _
-      squareColor, bf
+    with disp.graphics
+      .filledCircle( _
+        mouse.X, mouse.Y, _
+        25, ballColor )
+      
+      .filledRectangle( _
+        mouse.X - 200 - 25, mouse.Y - 25, _
+        mouse.X - 200 + 25, mouse.Y + 25, _
+        squareColor )
+    end with
     
     .endFrame()
   end with
-loop until( keyboard.pressed( Fb.SC_ESCAPE ) )
+loop until( _
+  keyboard.pressed( Fb.SC_ESCAPE ) orElse _
+  e.type = Fb.EVENT_WINDOW_CLOSE )

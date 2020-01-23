@@ -18,7 +18,7 @@ namespace Drawing
       declare constructor( _
         byval as integer, _
         byval as integer, _
-        byref as Drawing.FbColor )
+        byref as const Drawing.FbColor )
       declare constructor( _
         byref as Surface )
       declare virtual destructor()
@@ -43,7 +43,7 @@ namespace Drawing
         clear()
       declare sub _
         clear( _
-          byref as Drawing.FbColor )
+          byref as const Drawing.FbColor )
       declare function _
         clone() as Surface
       declare sub _
@@ -60,7 +60,7 @@ namespace Drawing
         create( _
           byval as integer, _
           byval as integer, _
-          byref as Drawing.FbColor )
+          byref as const Drawing.FbColor )
         
       as Fb.Image ptr _
         _surface
@@ -92,7 +92,7 @@ namespace Drawing
     Surface( _
       byval aWidth as integer, _
       byval aHeight as integer, _
-      byref aColor as Drawing.FbColor )
+      byref aColor as const Drawing.FbColor )
     
     aWidth => iif( aWidth < 1, 1, aWidth )
     aHeight => iif( aHeight < 1, 1, aHeight )
@@ -182,7 +182,7 @@ namespace Drawing
     Surface.create( _
       byval aWidth as integer, _
       byval aHeight as integer, _
-      byref aBaseColor as Drawing.FbColor )
+      byref aBaseColor as const Drawing.FbColor )
     
     if( _surface <> 0 ) then
       imageDestroy( _surface )
@@ -197,12 +197,6 @@ namespace Drawing
   
   sub _
     Surface.clear()
-  
-  end sub
-  
-  sub _
-    Surface.clear( _
-      byref aColor as Drawing.FbColor )
     
     dim as ulong ptr _
       px => pixels
@@ -214,7 +208,28 @@ namespace Drawing
       i as integer => 0 _
       to numPixels - 1
       
-      *px => aColor
+      *px => 0
+      px +=> 1
+    next
+  end sub
+  
+  sub _
+    Surface.clear( _
+      byref aColor as const Drawing.FbColor )
+    
+    dim as ulong ptr _
+      px => pixels
+    dim as ulong _
+      c => aColor
+    dim as integer _
+      numPixels => _
+        _surface->height * pitchInPixelsFor( _surface ) - 1
+      
+    for _
+      i as integer => 0 _
+      to numPixels - 1
+      
+      *px => c
       px +=> 1
     next
   end sub
@@ -262,6 +277,8 @@ namespace Drawing
     srcStride => _
       padding + srcStartX + ( _surface->width - 1 - srcEndX )
     
+    '' Fetch the position of the start of the pixel buffer
+    '' for each surface.
     src => pixels
     dst => destination.pixels
     

@@ -1,5 +1,5 @@
 #include once "fbfw-collections.bi"
-#include once "../common/bi/person.bi"
+#include once "../common/inc/person.bi"
 
 /'
   Usage example for Arrays
@@ -9,8 +9,8 @@ template( Array, of( Person ) )
 /'
   Some example predicates and actions
 '/
-#include once "../common/bi/person-predicates.bi"
-#include once "../common/bi/person-actions.bi"
+#include once "../common/inc/person-predicates.bi"
+#include once "../common/inc/person-actions.bi"
 
 sub _
   showArray( _

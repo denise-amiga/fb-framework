@@ -26,12 +26,12 @@ namespace Drawing
           opForeColor() as Drawing.FbColor override
         declare property _
           opForeColor( _
-            byref as Drawing.FbColor ) override
+            byref as const Drawing.FbColor ) override
         declare property _
           opBackColor() as Drawing.FbColor override
         declare property _
           opBackColor( _
-            byref as Drawing.FbColor ) override
+            byref as const Drawing.FbColor ) override
         declare property _
           opRows() as integer override
         declare property _
@@ -52,33 +52,55 @@ namespace Drawing
             byval as integer, _
             byval as integer ) override
         declare sub _
-          opClear() override
+          opClear( _
+            byval as Drawing.Surface ptr ) override
         declare sub _
           opClear( _
-            byref as Drawing.FbColor ) override
+            byval as Drawing.Surface ptr, _
+            byref as const Drawing.FbColor ) override
         declare sub _
-          opStartFrame() override
+          opClear( _
+            byval as Drawing.Surface ptr, _
+            byref as const Drawing.FbColor, _
+            byref as const Drawing.FbColor ) override
         declare sub _
-          opEndFrame() override
+          opStartFrame( _
+            byval as Drawing.Surface ptr ) override
+        declare sub _
+          opEndFrame( _
+            byval as Drawing.Surface ptr ) override
+        
+        declare function _
+          opCreateSurface( _
+            byval as integer, _
+            byval as integer ) _
+          as Drawing.Surface ptr override
+        declare function _
+          opCreateGraphics( _
+            byref as Drawing.Surface ) _
+          as Graphics ptr override
         
         declare sub _
           opTextAt( _
+            byval as Drawing.Surface ptr, _
             byval as integer, _
             byval as integer, _
             byref as const string ) override
         declare sub _
           opTextAt( _
+            byval as Drawing.Surface ptr, _
             byval as integer, _
             byval as integer, _
             byref as const string, _
-            byref as Drawing.FbColor ) override
+            byref as const Drawing.FbColor ) override
         declare sub _
           opTextAt( _
+            byval as Drawing.Surface ptr, _
             byval as integer, _
             byval as integer, _
             byref as const string, _
-            byref as Drawing.FbColor, _
-            byref as Drawing.FbColor ) override
+            byref as const Drawing.FbColor, _
+            byref as const Drawing.FbColor ) override
       
       protected:
         declare sub _
@@ -88,8 +110,6 @@ namespace Drawing
             byval as integer, _
             byval as integer )
           
-        as Surface ptr _
-          _surface
         as integer _
           _width, _
           _height, _
@@ -152,7 +172,7 @@ namespace Drawing
     
     property _
       DisplayOps.opForeColor( _
-        byref value as Drawing.FbColor )
+        byref value as const Drawing.FbColor )
       
       _foreColor => value
     end property
@@ -166,7 +186,7 @@ namespace Drawing
     
     property _
       DisplayOps.opBackColor( _
-        byref value as Drawing.FbColor )
+        byref value as const Drawing.FbColor )
       
       _backColor => value
     end property
@@ -207,6 +227,24 @@ namespace Drawing
         _initialized => true
       end if
     end sub
+    
+    function _
+      DisplayOps.opCreateSurface( _
+        byval aWidth as integer, _
+        byval aHeight as integer ) _
+      as Drawing.Surface ptr
+      
+      return( new Drawing.Surface( _
+        aWidth, aHeight ) )
+    end function
+    
+    function _
+      DisplayOps.opCreateGraphics( _
+        byref aSurface as Drawing.Surface ) _
+      as Graphics ptr
+      
+      return( FBGFX.Graphics.createFor( aSurface ) )
+    end function
     
     sub _
       DisplayOps.setMeasures( _
@@ -302,29 +340,48 @@ namespace Drawing
     end sub
     
     sub _
-      DisplayOps.opClear()
+      DisplayOps.opClear( _
+        byval s as Drawing.Surface ptr )
       
-      cls()
+      s->clear( _backColor )
     end sub
     
     sub _
       DisplayOps.opClear( _
-        byref aBackColor as Drawing.FbColor )
+        byval s as Drawing.Surface ptr, _
+        byref aBackColor as const Drawing.FbColor )
       
       _backColor => aBackColor
       
-      color( , _backColor )
-      cls()
+      s->clear( _backColor )
     end sub
     
     sub _
-      DisplayOps.opStartFrame()
+      DisplayOps.opClear( _
+        byval s as Drawing.Surface ptr, _
+        byref aForeColor as const Drawing.FbColor, _
+        byref aBackColor as const Drawing.FbColor )
+      
+      _foreColor => aForeColor
+      _backColor => aBackColor
+      
+      s->clear( _backColor )
+    end sub
+    
+    sub _
+      DisplayOps.opStartFrame( _
+        byval s as Drawing.Surface ptr )
       
       screenLock()
     end sub
     
     sub _
-      DisplayOps.opEndFrame()
+      DisplayOps.opEndFrame( _
+        byval s as Drawing.Surface ptr )
+      
+      put _
+        ( 0, 0 ), _
+        *s, pset
       
       screenUnlock()
       
@@ -333,44 +390,49 @@ namespace Drawing
     
     sub _
       DisplayOps.opTextAt( _
+        byval s as Drawing.Surface ptr, _
         byval aCol as integer, _
         byval aRow as integer, _
         byref aText as const string )
       
       opTextAt( _
-        aCol, aRow, aText, _foreColor, _backColor )
+        s, aCol, aRow, aText, _foreColor, _backColor )
     end sub
     
     sub _
       DisplayOps.opTextAt( _
+        byval s as Drawing.Surface ptr, _
         byval aCol as integer, _
         byval aRow as integer, _
         byref aText as const string, _
-        byref aForeColor as Drawing.FbColor )
+        byref aForeColor as const Drawing.FbColor )
       
       opTextAt( _
-        aCol, aRow, aText, aForeColor, _backColor )
+        s, aCol, aRow, aText, aForeColor, _backColor )
     end sub
     
     sub _
       DisplayOps.opTextAt( _
+        byval s as Drawing.Surface ptr, _
         byval aCol as integer, _
         byval aRow as integer, _
         byref aText as const string, _
-        byref aForeColor as Drawing.FbColor, _
-        byref aBackColor as Drawing.FbColor )
+        byref aForeColor as const Drawing.FbColor, _
+        byref aBackColor as const Drawing.FbColor )
       
       dim as integer _
-        posX => aCol * _fontWidth, _
-        posY => aRow * _fontHeight
+        posX => ( aCol - 1 ) * _fontWidth, _
+        posY => ( aRow - 1 ) * _fontHeight
       
       line _
+        *s, _
         ( posX, posY ) - _
         ( ( posX + len( aText ) * _fontWidth ) - 1, _
           ( posY + _fontHeight - 1 ) ), _
         aBackColor, bf
       
       draw string _
+        *s, _
         ( posX, posY ), _
         aText, _
         aForeColor

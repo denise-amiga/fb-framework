@@ -1,5 +1,5 @@
 #include once "fbfw-collections.bi"
-#include once "../common/bi/person.bi"
+#include once "../common/inc/person.bi"
 
 /'
   Slightly more complex example showing how you can compose each collection

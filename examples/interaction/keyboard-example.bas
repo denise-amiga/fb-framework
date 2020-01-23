@@ -28,11 +28,11 @@ var _
 dim as boolean _
   done
 
+dim as Fb.Event _
+  e
+
 do
   '' Poll events
-  dim as Fb.Event _
-    e
-  
   do while( screenEvent( @e ) )
     keyboard.onEvent( @e )
   loop
@@ -59,11 +59,14 @@ do
     .startFrame()
     .clear()
     
-    circle _
-      ( x, y ), _
-      radius, rgb( 255, 255, 255 ), , , , f
+    with disp.graphics
+      .filledCircle( _
+        x, y, radius, _
+        cast( FbColor, FbColor.White ) )
+    end with
+    
     .endFrame()
   end with
-  
-  sleep( 1, 1 )
-loop until( keyboard.pressed( Fb.SC_ESCAPE ) )
+loop until( _
+  keyboard.pressed( Fb.SC_ESCAPE ) orElse _
+  e.type = Fb.EVENT_WINDOW_CLOSE )

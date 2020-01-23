@@ -1,5 +1,5 @@
 #include once "fbfw-collections.bi"
-#include once "../common/bi/person.bi"
+#include once "../common/inc/person.bi"
 
 /'
   Another example for predicates, but using functions instead

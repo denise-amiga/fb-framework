@@ -1,5 +1,5 @@
 #include once "fbfw-collections.bi"
-#include once "../common/bi/person.bi"
+#include once "../common/inc/person.bi"
 
 /'
   Basic example of usage for Dictionaries
@@ -8,8 +8,8 @@ template( Dictionary, _
   of( integer ), of( Person ) )
 template( List, of( Person ) )
 
-#include once "../common/bi/person-predicates.bi"
-#include once "../common/bi/person-actions.bi"
+#include once "../common/inc/person-predicates.bi"
+#include once "../common/inc/person-actions.bi"
 
 scope
   var _

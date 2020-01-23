@@ -121,6 +121,10 @@
         as TType ptr
       
       declare function _
+        clear() _
+        byref as LinkedList( of( TType ) ) override
+      
+      declare function _
         contains( _
           byref as const TType ) _
         as boolean
@@ -192,9 +196,6 @@
       declare function _
         removeLastItem() _
         as TType ptr
-      declare function _
-        clear() _
-        byref as LinkedList( of( TType ) ) override
       
       declare function _
         forEach( _

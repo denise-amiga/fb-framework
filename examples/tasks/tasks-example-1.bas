@@ -3,8 +3,8 @@
 
 using Debug
 
-#include once "bi/task-manager-test-utils.bi"
-#include once "bi/concurrent-task.bi"
+#include once "inc/task-manager-test-utils.bi"
+#include once "inc/concurrent-task.bi"
 
 /'
   Just an event to inform us when a task was completed

@@ -184,6 +184,7 @@
     Dictionary( of( TKey ), of( TType ) )()
     
     dispose( _size, _hashTable )
+    
     deallocate( _hashTable )
   end destructor
   
@@ -207,12 +208,15 @@
       byval aSize as integer, _
       byval aHashTable as LinkedList( of( KeyValuePair( _
         of( TKey ), of( TType ) ) ) ) ptr ptr )
-      
+    
     for _
       i as integer => 0 _
       to aSize - 1
       
-      delete( aHashTable[ i ] )
+      if( aHashTable[ i ] <> 0 ) then
+        delete( aHashTable[ i ] )
+        aHashTable[ i ] => 0
+      end if
     next
   end sub
   
